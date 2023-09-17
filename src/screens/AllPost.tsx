@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
 import { PostInterface } from "../config";
-import { DataFetcher } from "../helpers";
+import { DataFetcher, PaginationState } from "../helpers";
 import { useGetAllPosts } from "../hooks";
 
-const AllPostView = ({ data }: { data: PostInterface[] }) => {
+const AllPostView = ({
+  data,
+}: {
+  data: PostInterface[];
+  pagination: PaginationState;
+}) => {
   return data.map((post) => (
     <Link key={post.id} to={`/${post.id}`}>
       <h3>{post.title}</h3>
@@ -17,7 +22,9 @@ export const AllPost = () => {
       query={useGetAllPosts}
       loadingView={<div>Loading...</div>}
       errorView={<div>Error</div>}
-      successView={(data) => <AllPostView data={data} />}
+      successView={(data, pagination) => (
+        <AllPostView data={data} pagination={pagination} />
+      )}
     />
   );
 };

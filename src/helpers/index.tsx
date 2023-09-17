@@ -1,24 +1,34 @@
 import { UseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { useState } from "react";
 import { Navigate } from "react-router";
 
+export type PaginationState = [
+  number | undefined,
+  React.Dispatch<React.SetStateAction<number | undefined>>
+];
+
 interface DataFetcherProps<QueryResult> {
-  query: () => UseQueryResult<QueryResult, AxiosError>;
+  query: (pagination?: number) => UseQueryResult<QueryResult, AxiosError>;
   loadingView: JSX.Element;
   errorView: JSX.Element;
-  successView: (data: QueryResult) => JSX.Element;
+  successView: (data: QueryResult, pagination: PaginationState) => JSX.Element;
+}
+
+interface DataFetcherConfiguration {
+  usePagination?: boolean;
   redirectOnNotFound?: boolean;
   logoutOnUnAuthorized?: boolean;
 }
 
 interface APIErrorHandlerProps {
-  redirectOnNotFound?: boolean;
-  logoutOnUnAuthorized?: boolean;
   status: number;
   children: JSX.Element;
 }
 
-const APIErrorHandler = (props: APIErrorHandlerProps) => {
+const APIErrorHandler = (
+  props: APIErrorHandlerProps & DataFetcherConfiguration
+) => {
   if (props.redirectOnNotFound && props.status === 404) {
     return <Navigate to="/not-found" replace />;
   }
@@ -28,22 +38,32 @@ const APIErrorHandler = (props: APIErrorHandlerProps) => {
   return props.children;
 };
 
-export const DataFetcher = <QueryResult,>(
-  props: DataFetcherProps<QueryResult>
-) => {
-  const { data, error, isLoading } = props.query();
+export const DataFetcher = <QueryResult,>({
+  query,
+  loadingView,
+  errorView,
+  successView,
+  ...configuration
+}: DataFetcherProps<QueryResult> & DataFetcherConfiguration) => {
+  const [pagination, setPagination] = useState(
+    configuration.usePagination ? 1 : undefined
+  );
+  const { data, error, isLoading } = query(pagination);
 
   if (error) {
     return (
-      <APIErrorHandler {...props} status={error.response?.status || 200}>
-        {props.errorView}
+      <APIErrorHandler
+        {...configuration}
+        status={error.response?.status || 200}
+      >
+        {errorView}
       </APIErrorHandler>
     );
   }
 
   if (isLoading || !data) {
-    return props.loadingView;
+    return loadingView;
   }
 
-  return props.successView(data);
+  return successView(data, [pagination, setPagination]);
 };
