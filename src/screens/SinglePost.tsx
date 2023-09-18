@@ -4,7 +4,7 @@ import { DataFetcher } from "../helpers";
 import { useGetSinglePost } from "../hooks";
 
 const SinglePostView = ({ data }: { data: PostInterface }) => {
-  return <p>{JSON.stringify(data)}</p>
+  return <p data-testid="single-post">{JSON.stringify(data)}</p>;
 };
 
 export const SinglePost = () => {
@@ -15,6 +15,7 @@ export const SinglePost = () => {
       errorView={<div>Error</div>}
       successView={(data) => <SinglePostView data={data} />}
       redirectOnNotFound
+      logoutOnUnAuthorized
     />
   );
 };

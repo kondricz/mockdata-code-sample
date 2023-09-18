@@ -25,6 +25,7 @@ export const AllPost = () => {
       successView={(data, pagination) => (
         <AllPostView data={data} pagination={pagination} />
       )}
+      logoutOnUnAuthorized
     />
   );
 };

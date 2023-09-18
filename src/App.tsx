@@ -5,17 +5,18 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import { AllPost, NotFound, SinglePost } from "./screens";
+import { AllPost, NotFound, SinglePost, Login } from "./screens";
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <>
-      <Route path="/" element={<AllPost />} />
-      <Route path="/:id" element={<SinglePost />} />
-      <Route path="/not-found" element={<NotFound />} />
-    </>
-  )
+export const AppRoutes = (
+  <>
+    <Route path="/" element={<AllPost />} />
+    <Route path="/:id" element={<SinglePost />} />
+    <Route path="/not-found" element={<NotFound />} />
+    <Route path="/login" element={<Login />} />
+  </>
 );
+
+const router = createBrowserRouter(createRoutesFromElements(AppRoutes));
 
 function App() {
   return <RouterProvider router={router} />;
